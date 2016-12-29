@@ -26,6 +26,23 @@ module PatchPanelApp
     end
   end
 
+#add
+  desc 'Mirror a new patch'
+  arg_name 'dpid port#1 port#2'
+  command :mirroring do |c|
+    c.desc 'Location to find socket files'
+    c.flag [:S, :socket_dir], default_value: Trema::DEFAULT_SOCKET_DIR
+
+    c.action do |_global_options, options, args|
+      dpid = args[0].hex
+      port1 = args[1].to_i
+      port2 = args[2].to_i
+      Trema.trema_process('PatchPanel', options[:socket_dir]).controller.
+        create_patch_mirror(dpid, port1, port2)
+    end
+  end
+#add end
+
   desc 'Deletes a patch'
   arg_name 'dpid port#1 port#2'
   command :delete do |c|
@@ -40,6 +57,18 @@ module PatchPanelApp
         delete_patch(dpid, port1, port2)
     end
   end
+
+  desc 'Patch and mirror list'
+  command :list do |c|
+    c.desc 'Location to find socket files'
+    c.flag [:S, :socket_dir], default_value: Trema::DEFAULT_SOCKET_DIR
+
+    c.action do |_global_options, options, args|
+      Trema.trema_process('PatchPanel', options[:socket_dir]).controller.
+        list()
+    end
+  end
+
 
   exit run(ARGV)
 end
